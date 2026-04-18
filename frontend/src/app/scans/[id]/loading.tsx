@@ -1,4 +1,6 @@
 // Shown by Next.js while scans/[id]/page.tsx is streaming.
+const previewLineWidths = Array.from({ length: 6 }, () => 60 + Math.random() * 35);
+
 export default function ScanDetailLoading() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
@@ -35,7 +37,7 @@ export default function ScanDetailLoading() {
 
       {/* preview skeleton */}
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-4 space-y-2">
-        {[95, 80, 70, 90, 65, 85].map((w, i) => (
+        {previewLineWidths.map((w, i) => (
           <div key={i} className="h-3 rounded bg-gray-800 animate-pulse" style={{ width: `${w}%` }} />
         ))}
       </div>
