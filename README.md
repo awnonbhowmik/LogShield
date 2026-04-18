@@ -47,7 +47,9 @@ LogShield is a full-stack portfolio project that accepts `.log` and `.txt` uploa
 
 ```
 com.logshield.backend/
+├── config/           CorsConfig (env-driven allowed origins)
 ├── controller/       REST endpoints (ScanController)
+├── filter/           RateLimitFilter (20 uploads/min per IP)
 ├── service/          Business logic (ScanService + impl)
 ├── scanner/          Detection engine, rules, redactor, scorer
 │   └── rules/        EmailRule, IpAddressRule, JwtTokenRule, ApiKeyRule, CreditCardRule
@@ -102,13 +104,21 @@ CREATE DATABASE logshield;
 
 ### 2 — Backend
 
+**With PostgreSQL running:**
+
 ```bash
 cd backend
-./mvnw spring-boot:run
+DB_PASSWORD=yourpassword ./mvnw spring-boot:run
 # API → http://localhost:8080
 ```
 
-Edit `src/main/resources/application.properties` if your PostgreSQL credentials differ from `postgres/postgres`.
+**Without PostgreSQL (H2 in-memory, dev profile):**
+
+```bash
+cd backend
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+# API → http://localhost:8080  ·  H2 console → http://localhost:8080/h2-console
+```
 
 ### 3 — Frontend
 
@@ -126,7 +136,10 @@ npm run dev
 
 > **One command starts everything** — PostgreSQL, Spring Boot, and Next.js.
 
+Copy the example env file and set a real DB password before starting:
+
 ```bash
+cp .env.example .env   # edit DB_PASSWORD at minimum
 docker compose up --build
 ```
 
@@ -153,14 +166,16 @@ docker compose down -v
 | `API_URL` | `http://localhost:8080` | Rewrite proxy target (server startup) |
 | `INTERNAL_API_URL` | `http://localhost:8080` | Server-side fetch base URL |
 
-### Backend (`application.properties`)
+### Backend (env vars / `.env` for Docker)
 
-| Property | Default | Purpose |
+| Variable | Default | Purpose |
 |----------|---------|---------|
-| `spring.datasource.url` | `jdbc:postgresql://localhost:5432/logshield` | DB connection |
-| `spring.datasource.username` | `postgres` | DB user |
-| `spring.datasource.password` | `postgres` | DB password |
-| `spring.servlet.multipart.max-file-size` | `10MB` | Upload limit |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/logshield` | DB connection string |
+| `DB_USERNAME` | `postgres` | DB user |
+| `DB_PASSWORD` | `postgres` | DB password — **change in production** |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins |
+
+Copy `.env.example` → `.env` and set real values before running Docker.
 
 ---
 
@@ -225,7 +240,7 @@ Two ready-to-upload samples live in `samples/`:
 - [ ] **Bulk upload** — scan a ZIP archive containing multiple log files
 - [ ] **Export report** — generate a PDF/CSV summary of findings
 - [ ] **Testcontainers** — full integration tests against a real PostgreSQL container
-- [ ] **Rate limiting** — throttle uploads per IP with Spring's filter chain
+- [x] **Rate limiting** — 20 uploads/min per IP via sliding-window `OncePerRequestFilter`
 - [ ] **S3 storage** — store original and redacted files in object storage instead of DB columns
 
 ---
