@@ -4,8 +4,8 @@
 
 LogShield is a full-stack portfolio project that accepts `.log` and `.txt` uploads, scans them for credentials and PII, returns a redacted copy, and persists a searchable scan history.
 
-[![Frontend CI](https://github.com/YOUR_USERNAME/logshield/actions/workflows/frontend.yml/badge.svg)](https://github.com/YOUR_USERNAME/logshield/actions/workflows/frontend.yml)
-[![Backend CI](https://github.com/YOUR_USERNAME/logshield/actions/workflows/backend.yml/badge.svg)](https://github.com/YOUR_USERNAME/logshield/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/awnonbhowmik/LogShield/actions/workflows/frontend.yml/badge.svg)](https://github.com/awnonbhowmik/LogShield/actions/workflows/frontend.yml)
+[![Backend CI](https://github.com/awnonbhowmik/LogShield/actions/workflows/backend.yml/badge.svg)](https://github.com/awnonbhowmik/LogShield/actions/workflows/backend.yml)
 
 ---
 
