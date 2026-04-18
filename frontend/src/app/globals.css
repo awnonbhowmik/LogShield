@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #030712; /* gray-950 */
+  color: #f9fafb;            /* gray-50  */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Monospace blocks */
+pre, code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
