@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MultipartException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMultipartError(MultipartException ex) {
-        return ErrorResponse.of(400, "Bad Request", "Malformed multipart request: " + ex.getMessage());
+        return ErrorResponse.of(400, "Bad Request", "Invalid or malformed file upload");
     }
 
     @ExceptionHandler(Exception.class)

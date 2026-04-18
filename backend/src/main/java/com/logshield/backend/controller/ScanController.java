@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -48,7 +49,7 @@ public class ScanController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"redacted_" + detail.filename() + "\"")
+                        "attachment; filename=\"redacted_" + new File(detail.filename()).getName() + "\"")
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(content);
     }
