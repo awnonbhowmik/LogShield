@@ -1,0 +1,11 @@
+package com.logshield.backend.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ScanNotFoundException extends RuntimeException {
+    public ScanNotFoundException(Long id) {
+        super("Scan not found: " + id);
+    }
+}

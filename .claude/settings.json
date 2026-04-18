@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest frontend --typescript --tailwind --src-dir --app --eslint --no-import-alias --use-npm)",
+      "Bash(mvn -q wrapper:wrapper -Dmaven=3.9.6)",
+      "Read(//usr/**)",
+      "Read(//opt/**)",
+      "Bash(chmod +x /home/abhowmik/Desktop/LogShield/backend/mvnw)",
+      "Bash(curl --version)",
+      "Bash(curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg)",
+      "Bash(sudo dd *)",
+      "Bash(sudo chmod *)",
+      "Bash(dpkg --print-architecture)",
+      "Bash(echo \"deb [arch=$\\(dpkg --print-architecture\\) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\")",
+      "Bash(sudo tee *)",
+      "Bash(mkdir -p ~/bin)",
+      "Bash(curl -fsSL https://github.com/cli/cli/releases/download/v2.62.0/gh_2.62.0_linux_amd64.tar.gz -o /tmp/gh.tar.gz)",
+      "Bash(cp /tmp/gh_2.62.0_linux_amd64/bin/gh ~/bin/gh)",
+      "Bash(~/bin/gh --version)",
+      "Bash(export PATH=\"$HOME/bin:$PATH\")",
+      "Bash(git init *)"
+    ],
+    "additionalDirectories": [
+      "/home/abhowmik/Desktop/LogShield/frontend/src/app/scans"
+    ]
+  }
+}
