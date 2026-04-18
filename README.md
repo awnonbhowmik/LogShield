@@ -232,19 +232,6 @@ Two ready-to-upload samples live in `samples/`:
 
 ---
 
-## Roadmap
-
-- [ ] **OAuth / JWT auth** — protect the scan API with user accounts
-- [ ] **Luhn validation** — confirm credit card matches pass the Luhn checksum before flagging
-- [ ] **Custom rules** — let users upload regex rules via the UI
-- [ ] **Bulk upload** — scan a ZIP archive containing multiple log files
-- [ ] **Export report** — generate a PDF/CSV summary of findings
-- [ ] **Testcontainers** — full integration tests against a real PostgreSQL container
-- [x] **Rate limiting** — 20 uploads/min per IP via sliding-window `OncePerRequestFilter`
-- [ ] **S3 storage** — store original and redacted files in object storage instead of DB columns
-
----
-
 ## Tech stack
 
 | Layer | Technology |
