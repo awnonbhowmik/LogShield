@@ -35,8 +35,8 @@ export default function ScanDetailLoading() {
 
       {/* preview skeleton */}
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-4 space-y-2">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-3 rounded bg-gray-800 animate-pulse" style={{ width: `${60 + Math.random() * 35}%` }} />
+        {[95, 80, 70, 90, 65, 85].map((w, i) => (
+          <div key={i} className="h-3 rounded bg-gray-800 animate-pulse" style={{ width: `${w}%` }} />
         ))}
       </div>
     </div>
