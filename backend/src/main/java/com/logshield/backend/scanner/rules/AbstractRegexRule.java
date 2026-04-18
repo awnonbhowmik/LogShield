@@ -37,11 +37,17 @@ public abstract class AbstractRegexRule implements DetectionRule {
         return matches;
     }
 
-    /** Counts newlines before the given character offset to derive a 1-based line number. */
+    /** Counts newlines before the given character offset to derive a 1-based line number. Handles both LF and CRLF. */
     static int lineOf(String text, int offset) {
         int line = 1;
         for (int i = 0; i < offset; i++) {
-            if (text.charAt(i) == '\n') line++;
+            char c = text.charAt(i);
+            if (c == '\n') {
+                line++;
+            } else if (c == '\r') {
+                line++;
+                if (i + 1 < offset && text.charAt(i + 1) == '\n') i++;
+            }
         }
         return line;
     }

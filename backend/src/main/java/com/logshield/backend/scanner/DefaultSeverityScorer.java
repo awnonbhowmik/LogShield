@@ -21,11 +21,12 @@ import java.util.Map;
 public class DefaultSeverityScorer implements SeverityScorer {
 
     private static final Map<FindingCategory, Integer> WEIGHTS = Map.of(
-            FindingCategory.EMAIL,       5,
-            FindingCategory.IP_ADDRESS,  5,
-            FindingCategory.JWT_TOKEN,  20,
-            FindingCategory.API_KEY,    25,
-            FindingCategory.CREDIT_CARD, 25
+            FindingCategory.EMAIL,                5,
+            FindingCategory.IP_ADDRESS,           5,
+            FindingCategory.JWT_TOKEN,           20,
+            FindingCategory.API_KEY,             25,
+            FindingCategory.CREDIT_CARD,         25,
+            FindingCategory.DB_CONNECTION_STRING, 30
     );
 
     @Override

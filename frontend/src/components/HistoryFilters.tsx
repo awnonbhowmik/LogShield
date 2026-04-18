@@ -1,41 +1,33 @@
 'use client';
-// Client Component — owns filter state; renders HistoryTable with the filtered subset.
 
-import { useState, useMemo } from 'react';
-import type { ScanSummaryResponse, FindingSeverity } from '@/types/scan';
-import HistoryTable from './HistoryTable';
+import { useRouter, usePathname } from 'next/navigation';
+import { useCallback, useTransition } from 'react';
 
-type SeverityFilter = FindingSeverity | 'ALL';
-
-function scoreToLevel(score: number | null): FindingSeverity | null {
-  if (!score) return null;
-  if (score <= 15) return 'LOW';
-  if (score <= 40) return 'MEDIUM';
-  if (score <= 75) return 'HIGH';
-  return 'CRITICAL';
+interface Props {
+  initialSearch: string;
+  currentPage: number;
+  pageSize: number;
 }
 
-export default function HistoryFilters({ scans }: { scans: ScanSummaryResponse[] }) {
-  const [search, setSearch]     = useState('');
-  const [severity, setSeverity] = useState<SeverityFilter>('ALL');
-  const [fromDate, setFromDate] = useState('');
+export default function HistoryFilters({ initialSearch, currentPage, pageSize }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
-  const filtered = useMemo(() => {
-    return scans.filter((s) => {
-      if (search && !s.filename.toLowerCase().includes(search.toLowerCase())) return false;
-      if (severity !== 'ALL' && scoreToLevel(s.severityScore) !== severity) return false;
-      if (fromDate && new Date(s.uploadedAt) < new Date(fromDate)) return false;
-      return true;
-    });
-  }, [scans, search, severity, fromDate]);
+  const push = useCallback((search: string, page = 0) => {
+    const qs = new URLSearchParams();
+    if (search) qs.set('search', search);
+    if (page > 0) qs.set('page', String(page));
+    if (pageSize !== 20) qs.set('size', String(pageSize));
+    const query = qs.toString() ? `?${qs}` : '';
+    startTransition(() => router.push(`${pathname}${query}`));
+  }, [router, pathname, pageSize]);
 
-  const hasFilters = search !== '' || severity !== 'ALL' || fromDate !== '';
+  const hasFilters = initialSearch !== '';
 
   return (
-    <div className="space-y-4">
-      {/* Filter bar */}
+    <div className="space-y-3">
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Filename search */}
         <div className="relative flex-1">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -44,37 +36,19 @@ export default function HistoryFilters({ scans }: { scans: ScanSummaryResponse[]
           <input
             type="text"
             placeholder="Search by filename…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-700 bg-gray-900 pl-9 pr-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors"
+            defaultValue={initialSearch}
+            onChange={(e) => push(e.target.value)}
+            className={[
+              'w-full rounded-xl border border-gray-700 bg-gray-900 pl-9 pr-4 py-2 text-sm text-gray-200',
+              'placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors',
+              isPending ? 'opacity-60' : '',
+            ].join(' ')}
           />
         </div>
 
-        {/* Severity filter */}
-        <select
-          value={severity}
-          onChange={(e) => setSeverity(e.target.value as SeverityFilter)}
-          className="rounded-xl border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-blue-600 transition-colors"
-        >
-          <option value="ALL">All severities</option>
-          <option value="CRITICAL">Critical</option>
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
-        </select>
-
-        {/* From date */}
-        <input
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-          className="rounded-xl border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-blue-600 transition-colors"
-        />
-
-        {/* Clear */}
         {hasFilters && (
           <button
-            onClick={() => { setSearch(''); setSeverity('ALL'); setFromDate(''); }}
+            onClick={() => push('')}
             className="rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-400 hover:text-white hover:border-gray-500 transition-colors whitespace-nowrap"
           >
             Clear
@@ -82,14 +56,9 @@ export default function HistoryFilters({ scans }: { scans: ScanSummaryResponse[]
         )}
       </div>
 
-      {/* Result count */}
-      {hasFilters && (
-        <p className="text-xs text-gray-500">
-          {filtered.length} of {scans.length} scans match
-        </p>
+      {isPending && (
+        <p className="text-xs text-gray-500 animate-pulse">Filtering…</p>
       )}
-
-      <HistoryTable scans={filtered} />
     </div>
   );
 }

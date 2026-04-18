@@ -1,5 +1,5 @@
 export type ScanStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
-export type FindingCategory = 'EMAIL' | 'IP_ADDRESS' | 'API_KEY' | 'JWT_TOKEN' | 'CREDIT_CARD';
+export type FindingCategory = 'EMAIL' | 'IP_ADDRESS' | 'API_KEY' | 'JWT_TOKEN' | 'CREDIT_CARD' | 'DB_CONNECTION_STRING';
 export type FindingSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 export interface FindingResponse {
@@ -29,6 +29,14 @@ export interface ScanDetailResponse {
   originalSize: number;
   redactedContent: string | null;
   findings: FindingResponse[];
+}
+
+export interface PagedScanResponse {
+  content: ScanSummaryResponse[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface ScanUploadResponse {

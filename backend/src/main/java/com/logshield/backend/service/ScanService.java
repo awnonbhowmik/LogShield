@@ -1,5 +1,6 @@
 package com.logshield.backend.service;
 
+import com.logshield.backend.dto.PagedScanResponse;
 import com.logshield.backend.dto.ScanDetailResponse;
 import com.logshield.backend.dto.ScanSummaryResponse;
 import com.logshield.backend.dto.ScanUploadResponse;
@@ -12,6 +13,8 @@ public interface ScanService {
     ScanUploadResponse processScan(MultipartFile file);
 
     List<ScanSummaryResponse> getAllScans();
+
+    PagedScanResponse getScansPage(String search, int page, int size);
 
     ScanDetailResponse getScanById(Long id);
 

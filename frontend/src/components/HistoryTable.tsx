@@ -3,22 +3,8 @@
 import Link from 'next/link';
 import type { ScanSummaryResponse } from '@/types/scan';
 import SeverityBadge from './SeverityBadge';
-import type { FindingSeverity } from '@/types/scan';
-
-function scoreToLevel(score: number | null): FindingSeverity | null {
-  if (score === null || score === 0) return null;
-  if (score <= 15) return 'LOW';
-  if (score <= 40) return 'MEDIUM';
-  if (score <= 75) return 'HIGH';
-  return 'CRITICAL';
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-}
+import { scoreToLevel } from '@/lib/severity';
+import { formatDate } from '@/lib/format';
 
 export default function HistoryTable({ scans }: { scans: ScanSummaryResponse[] }) {
   if (scans.length === 0) {

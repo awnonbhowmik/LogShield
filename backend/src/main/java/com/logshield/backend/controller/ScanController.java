@@ -1,7 +1,7 @@
 package com.logshield.backend.controller;
 
+import com.logshield.backend.dto.PagedScanResponse;
 import com.logshield.backend.dto.ScanDetailResponse;
-import com.logshield.backend.dto.ScanSummaryResponse;
 import com.logshield.backend.dto.ScanUploadResponse;
 import com.logshield.backend.service.ScanService;
 import com.logshield.backend.validation.FileValidator;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/scans")
@@ -37,8 +36,13 @@ public class ScanController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ScanSummaryResponse>> getAllScans() {
-        return ResponseEntity.ok(scanService.getAllScans());
+    public ResponseEntity<PagedScanResponse> getAllScans(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(100, Math.max(1, size));
+        return ResponseEntity.ok(scanService.getScansPage(search, safePage, safeSize));
     }
 
     @GetMapping("/{id}")

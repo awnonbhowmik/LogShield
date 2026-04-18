@@ -1,6 +1,6 @@
 import type {
+  PagedScanResponse,
   ScanDetailResponse,
-  ScanSummaryResponse,
   ScanUploadResponse,
 } from '@/types/scan';
 
@@ -40,9 +40,18 @@ export async function uploadScan(file: File): Promise<ScanUploadResponse> {
   return unwrap<ScanUploadResponse>(res);
 }
 
-export async function getScans(): Promise<ScanSummaryResponse[]> {
-  const res = await fetch(url('/api/scans'), { cache: 'no-store' });
-  return unwrap<ScanSummaryResponse[]>(res);
+export async function getScans(params?: {
+  search?: string;
+  page?: number;
+  size?: number;
+}): Promise<PagedScanResponse> {
+  const qs = new URLSearchParams();
+  if (params?.search) qs.set('search', params.search);
+  if (params?.page !== undefined) qs.set('page', String(params.page));
+  if (params?.size !== undefined) qs.set('size', String(params.size));
+  const query = qs.toString() ? `?${qs}` : '';
+  const res = await fetch(url(`/api/scans${query}`), { cache: 'no-store' });
+  return unwrap<PagedScanResponse>(res);
 }
 
 export async function getScan(id: number): Promise<ScanDetailResponse> {

@@ -1,23 +1,16 @@
 // Server Component — receives data as props, pure display.
 import type { ScanUploadResponse } from '@/types/scan';
 import SeverityBadge from './SeverityBadge';
-import type { FindingSeverity } from '@/types/scan';
+import { scoreToLevel } from '@/lib/severity';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  EMAIL:       'Emails',
-  IP_ADDRESS:  'IP Addresses',
-  API_KEY:     'API Keys',
-  JWT_TOKEN:   'JWT Tokens',
-  CREDIT_CARD: 'Credit Cards',
+  EMAIL:                'Emails',
+  IP_ADDRESS:           'IP Addresses',
+  API_KEY:              'API Keys',
+  JWT_TOKEN:            'JWT Tokens',
+  CREDIT_CARD:          'Credit Cards',
+  DB_CONNECTION_STRING: 'DB Connection Strings',
 };
-
-function scoreToLevel(score: number | null): FindingSeverity | null {
-  if (score === null || score === 0) return null;
-  if (score <= 15) return 'LOW';
-  if (score <= 40) return 'MEDIUM';
-  if (score <= 75) return 'HIGH';
-  return 'CRITICAL';
-}
 
 export default function SummaryCards({ scan }: { scan: ScanUploadResponse }) {
   const level = scoreToLevel(scan.severityScore);

@@ -47,10 +47,22 @@ export default function UploadCard() {
       const result = await uploadScan(file);
       router.push(`/scans/${result.id}`);
     } catch (err) {
-      const msg =
-        err instanceof ApiError
-          ? err.message
-          : 'Something went wrong. Please try again.';
+      let msg: string;
+      if (err instanceof ApiError) {
+        if (err.status === 400 || err.status === 415) {
+          msg = err.message; // validation error — backend message is user-safe
+        } else if (err.status === 429) {
+          msg = 'Too many uploads. Please wait a minute and try again.';
+        } else if (err.status >= 500) {
+          msg = 'Server error. Please try again later.';
+        } else {
+          msg = err.message;
+        }
+      } else if (err instanceof TypeError && (err as TypeError).message.includes('fetch')) {
+        msg = 'Cannot reach the server. Check your connection and try again.';
+      } else {
+        msg = 'Something went wrong. Please try again.';
+      }
       setErrorMsg(msg);
       setState('error');
     }

@@ -1,6 +1,7 @@
 package com.logshield.backend.controller;
 
 import com.logshield.backend.dto.FindingResponse;
+import com.logshield.backend.dto.PagedScanResponse;
 import com.logshield.backend.dto.ScanDetailResponse;
 import com.logshield.backend.dto.ScanSummaryResponse;
 import com.logshield.backend.dto.ScanUploadResponse;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -126,28 +129,46 @@ class ScanControllerTest {
     // ── GET /api/scans ────────────────────────────────────────────────────────
 
     @Test
-    void getAllScans_returns200WithList() throws Exception {
+    void getAllScans_returns200WithPagedResponse() throws Exception {
         ScanSummaryResponse summary = new ScanSummaryResponse(
                 1L, "app.log", LocalDateTime.now(), ScanStatus.COMPLETED, 25, 3);
+        PagedScanResponse paged = new PagedScanResponse(List.of(summary), 0, 20, 1L, 1);
 
-        when(scanService.getAllScans()).thenReturn(List.of(summary));
+        when(scanService.getScansPage(isNull(), anyInt(), anyInt())).thenReturn(paged);
 
         mockMvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].filename").value("app.log"))
-                .andExpect(jsonPath("$[0].findingCount").value(3));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].filename").value("app.log"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
     }
 
     @Test
-    void getAllScans_returnsEmptyList() throws Exception {
-        when(scanService.getAllScans()).thenReturn(List.of());
+    void getAllScans_returnsEmptyPage() throws Exception {
+        PagedScanResponse empty = new PagedScanResponse(List.of(), 0, 20, 0L, 0);
+
+        when(scanService.getScansPage(isNull(), anyInt(), anyInt())).thenReturn(empty);
 
         mockMvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    void getAllScans_withSearchParam_passesSearchToService() throws Exception {
+        ScanSummaryResponse summary = new ScanSummaryResponse(
+                2L, "error.log", LocalDateTime.now(), ScanStatus.COMPLETED, 10, 1);
+        PagedScanResponse paged = new PagedScanResponse(List.of(summary), 0, 20, 1L, 1);
+
+        when(scanService.getScansPage(any(), anyInt(), anyInt())).thenReturn(paged);
+
+        mockMvc.perform(get(ENDPOINT).param("search", "error"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].filename").value("error.log"));
     }
 
     // ── GET /api/scans/{id} ───────────────────────────────────────────────────

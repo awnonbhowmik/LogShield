@@ -15,9 +15,11 @@ public class RedactionService {
 
     public String redact(String text, List<RawMatch> matches) {
         StringBuilder sb = new StringBuilder(text);
+        int len = text.length();
 
         matches.stream()
                 .sorted(Comparator.comparingInt(RawMatch::start).reversed())
+                .filter(m -> m.start() >= 0 && m.start() < len && m.end() <= len && m.start() <= m.end())
                 .forEach(m -> sb.replace(m.start(), m.end(), m.redactedValue()));
 
         return sb.toString();

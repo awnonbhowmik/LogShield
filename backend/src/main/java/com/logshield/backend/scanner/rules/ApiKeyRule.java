@@ -11,12 +11,13 @@ public class ApiKeyRule extends AbstractRegexRule {
 
     // Matches:
     //   1. Common prefixed keys  e.g. sk-abc123..., api_key-XYZ...
-    //   2. AWS IAM access key IDs  e.g. AKIAIOSFODNN7EXAMPLE
+    //   2. AWS IAM permanent access key IDs  e.g. AKIAIOSFODNN7EXAMPLE
+    //   3. AWS STS temporary credentials    e.g. ASIAIOSFODNN7EXAMPLE
     // Note: bare hex strings removed — too broad (matches hashes) and a ReDoS risk.
     private static final Pattern PATTERN = Pattern.compile(
             "\\b(?:" +
             "(?:sk|pk|api|key|token|secret|access|bearer|auth)[_\\-=][A-Za-z0-9_\\-]{16,64}" +
-            "|AKIA[0-9A-Z]{16}" +
+            "|(?:AKIA|ASIA|AROA|AIDA|AIPA|ANPA|ANVA|APKA)[0-9A-Z]{16}" +
             ")\\b"
     );
 

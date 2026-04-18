@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "scan_finding")
+@Table(name = "scan_finding", indexes = {
+        @Index(name = "idx_scan_finding_job_id", columnList = "scan_job_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,7 +39,7 @@ public class ScanFinding {
     private FindingSeverity severity;
 
     public enum FindingCategory {
-        EMAIL, IP_ADDRESS, API_KEY, JWT_TOKEN, CREDIT_CARD
+        EMAIL, IP_ADDRESS, API_KEY, JWT_TOKEN, CREDIT_CARD, DB_CONNECTION_STRING
     }
 
     public enum FindingSeverity {

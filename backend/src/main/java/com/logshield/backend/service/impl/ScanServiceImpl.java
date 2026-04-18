@@ -1,6 +1,7 @@
 package com.logshield.backend.service.impl;
 
 import com.logshield.backend.dto.FindingResponse;
+import com.logshield.backend.dto.PagedScanResponse;
 import com.logshield.backend.dto.ScanDetailResponse;
 import com.logshield.backend.dto.ScanSummaryResponse;
 import com.logshield.backend.dto.ScanUploadResponse;
@@ -20,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,8 +45,8 @@ public class ScanServiceImpl implements ScanService {
     @Override
     @Transactional
     public ScanUploadResponse processScan(MultipartFile file) {
-        String filename = file.getOriginalFilename() != null
-                ? file.getOriginalFilename() : "unknown.log";
+        String original = file.getOriginalFilename();
+        String filename = (original != null && !original.isBlank()) ? original : "unknown.log";
 
         String content;
         try {
@@ -94,6 +98,20 @@ public class ScanServiceImpl implements ScanService {
                         job.getFindings().size()
                 ))
                 .toList();
+    }
+
+    @Override
+    public PagedScanResponse getScansPage(String search, int page, int size) {
+        String searchTerm = (search == null || search.isBlank()) ? null : search.trim();
+        Page<ScanJob> p = scanJobRepository.findByFilenameContaining(
+                searchTerm, PageRequest.of(page, size));
+        List<ScanSummaryResponse> content = p.getContent().stream()
+                .map(job -> new ScanSummaryResponse(
+                        job.getId(), job.getFilename(), job.getUploadedAt(),
+                        job.getStatus(), job.getSeverityScore(), job.getFindings().size()))
+                .toList();
+        return new PagedScanResponse(content, p.getNumber(), p.getSize(),
+                p.getTotalElements(), p.getTotalPages());
     }
 
     @Override

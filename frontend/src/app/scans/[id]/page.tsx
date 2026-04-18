@@ -6,28 +6,8 @@ import { getScan, downloadUrl, ApiError } from '@/lib/api';
 import FindingsTable from '@/components/FindingsTable';
 import RedactedPreview from '@/components/RedactedPreview';
 import SeverityBadge from '@/components/SeverityBadge';
-import type { FindingSeverity } from '@/types/scan';
-
-function scoreToLevel(score: number | null): FindingSeverity | null {
-  if (!score) return null;
-  if (score <= 15) return 'LOW';
-  if (score <= 40) return 'MEDIUM';
-  if (score <= 75) return 'HIGH';
-  return 'CRITICAL';
-}
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-}
-
-function fmtBytes(n: number) {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
+import { scoreToLevel } from '@/lib/severity';
+import { formatDate, formatBytes } from '@/lib/format';
 
 export default async function ScanDetailPage({ params }: PageProps<'/scans/[id]'>) {
   const { id } = await params;
@@ -53,7 +33,7 @@ export default async function ScanDetailPage({ params }: PageProps<'/scans/[id]'
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white font-mono break-all">{scan.filename}</h1>
-          <p className="mt-1 text-sm text-gray-500">Scanned {fmtDate(scan.uploadedAt)}</p>
+          <p className="mt-1 text-sm text-gray-500">Scanned {formatDate(scan.uploadedAt)}</p>
         </div>
         {scan.status === 'COMPLETED' && (
           <a
@@ -90,25 +70,42 @@ export default async function ScanDetailPage({ params }: PageProps<'/scans/[id]'
           </div>
         </Stat>
         <Stat label="File Size">
-          <span className="text-white">{fmtBytes(scan.originalSize)}</span>
+          <span className="text-white">{formatBytes(scan.originalSize)}</span>
         </Stat>
       </div>
 
-      {/* Findings */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-3">
-          Findings ({scan.findings.length})
-        </h2>
-        <FindingsTable findings={scan.findings} />
-      </section>
+      {scan.status === 'FAILED' && (
+        <div className="rounded-xl border border-red-800 bg-red-950/30 px-5 py-4 text-sm text-red-400">
+          This scan failed to process. The file may be malformed or an internal error occurred.{' '}
+          <Link href="/upload" className="underline hover:text-red-300">Try uploading again.</Link>
+        </div>
+      )}
 
-      {/* Redacted content */}
-      <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-3">
-          Redacted Content
-        </h2>
-        <RedactedPreview content={scan.redactedContent} />
-      </section>
+      {scan.status === 'PENDING' && (
+        <div className="rounded-xl border border-yellow-800 bg-yellow-950/20 px-5 py-4 text-sm text-yellow-400">
+          This scan is still processing. Refresh the page in a moment.
+        </div>
+      )}
+
+      {scan.status === 'COMPLETED' && (
+        <>
+          {/* Findings */}
+          <section>
+            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-3">
+              Findings ({scan.findings.length})
+            </h2>
+            <FindingsTable findings={scan.findings} />
+          </section>
+
+          {/* Redacted content */}
+          <section>
+            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-3">
+              Redacted Content
+            </h2>
+            <RedactedPreview content={scan.redactedContent} />
+          </section>
+        </>
+      )}
     </div>
   );
 }

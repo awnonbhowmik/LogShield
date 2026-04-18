@@ -24,6 +24,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private final ConcurrentHashMap<String, Deque<Long>> windowMap = new ConcurrentHashMap<>();
 
+    /** Returns the seconds until the oldest request in the window expires, or 60 if none. */
+    private long retryAfterSeconds(String ip) {
+        Deque<Long> timestamps = windowMap.get(ip);
+        if (timestamps == null) return 60;
+        synchronized (timestamps) {
+            if (timestamps.isEmpty()) return 60;
+            long oldest = timestamps.peekFirst();
+            long expiresAt = oldest + WINDOW_MS;
+            long remaining = expiresAt - System.currentTimeMillis();
+            return Math.max(1, (remaining + 999) / 1000); // ceil to whole seconds
+        }
+    }
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return !("POST".equals(request.getMethod()) &&
@@ -36,11 +49,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     FilterChain chain) throws ServletException, IOException {
         String ip = resolveClientIp(request);
         if (!allow(ip)) {
+            long retryAfter = retryAfterSeconds(ip);
             response.setStatus(429);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setHeader("Retry-After", String.valueOf(retryAfter));
             response.getWriter().write(
                     "{\"status\":429,\"error\":\"Too Many Requests\"," +
-                    "\"message\":\"Upload limit exceeded. Try again in a minute.\"}");
+                    "\"message\":\"Upload limit exceeded. Try again in " + retryAfter + " second(s).\"}");
             return;
         }
         chain.doFilter(request, response);
