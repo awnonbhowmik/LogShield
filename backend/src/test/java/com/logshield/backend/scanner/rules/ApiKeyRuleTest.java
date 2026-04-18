@@ -31,7 +31,7 @@ class ApiKeyRuleTest {
 
     @Test
     void detectsHexSecret() {
-        // 32-char hex string commonly used as a secret/token
+        // key=value format with known secret prefix and 32-char hex value
         List<RawMatch> matches = rule.detect("secret=d41d8cd98f00b204e9800998ecf8427e");
         assertThat(matches).hasSize(1);
     }
