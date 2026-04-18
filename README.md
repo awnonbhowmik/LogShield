@@ -28,7 +28,7 @@ LogShield is a full-stack portfolio project that accepts `.log` and `.txt` uploa
 
 ```
 ┌─────────────────┐       HTTP / JSON         ┌─────────────────────┐
-│  Next.js 16     │ ───────────────────────── │  Spring Boot 3      │
+│  Next.js 16     │ ───────────────────────── │  Spring Boot 4      │
 │  (port 3000)    │   POST /api/scans         │  (port 8080)        │
 │                 │   GET  /api/scans         │                     │
 │  App Router     │   GET  /api/scans/:id     │  Detection Engine   │
@@ -235,7 +235,7 @@ Two ready-to-upload samples live in `samples/`:
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Next.js 16, React 19, TailwindCSS v4, TypeScript |
-| Backend | Java 25, Spring Boot 3.2, Spring Data JPA, Lombok |
+| Backend | Java 25, Spring Boot 4.0, Spring Data JPA, Lombok |
 | Database | PostgreSQL 16 |
 | Build | Maven Wrapper, npm |
 | CI | GitHub Actions |
