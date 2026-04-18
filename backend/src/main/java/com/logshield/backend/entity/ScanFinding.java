@@ -20,7 +20,7 @@ public class ScanFinding {
     @JoinColumn(name = "scan_job_id", nullable = false)
     private ScanJob scanJob;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     @Enumerated(EnumType.STRING)
     private FindingCategory category;
 
@@ -32,6 +32,7 @@ public class ScanFinding {
 
     private Integer lineNumber;
 
+    @Column(columnDefinition = "VARCHAR(50)")
     @Enumerated(EnumType.STRING)
     private FindingSeverity severity;
 

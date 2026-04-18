@@ -26,7 +26,7 @@ public class ScanJob {
     @Column(nullable = false)
     private LocalDateTime uploadedAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     @Enumerated(EnumType.STRING)
     private ScanStatus status;
 
